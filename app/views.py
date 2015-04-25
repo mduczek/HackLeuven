@@ -1,7 +1,7 @@
 import json
 import requests
 
-from flask import render_template, request, make_response
+from flask import render_template, request, make_response, jsonify
 from collections import namedtuple
 
 from app import app
@@ -74,7 +74,7 @@ def db_events_put(user, ics):
 
 def db_events_get(user, dt_start, dt_end):
     link = DB_PATH+'/events/_search?pretty'
-    
+
     es_query = {"query": { "bool": { "must": [
         {   "range": {
                 "dt_start": { "gte": "2013-12-09T00:00:00.000Z" }
@@ -115,17 +115,8 @@ def upload_file():
             print ics_str[:200]
             db_events_put(user, ics_str)
 
-            return make_response('uploaded_file: ' + str(db_events_get(user, None, None)))
+            return jsonify(status="ok"), 200 # make_response('uploaded_file: ' + str(db_events_get(user, None, None)))
         else:
-            return make_response("invalid file!")
-    else:
-        return '''
-        <!doctype html>
-        <title>Upload new File</title>
-        <h1>Upload new File</h1>
-        <form action="" method=post enctype=multipart/form-data>
-          <p><input type=file name=file accept=".ics">
-             <input type=text name=user>
-             <input type=submit value=Upload>
-        </form>
-        '''
+            return jsonify(status="invalid file"), 296 #make_response("invalid file!")
+
+    return jsonify(status="unknown"), 420

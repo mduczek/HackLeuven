@@ -2,13 +2,50 @@ calendar_main = function () {
     log("calendar_main");
 
     showDate();
+    setInterval(function() { showDate(); }, 60*1000);
 
     var calendar = $.parseJSON($("#calendar-value").text());
 
+    $("#add_calendar").click(function () {
+        $("#upload_alert").hide().removeClass("alert-danger").removeClass('alert-succes').text("");
+    });
 
     //tmp TODO REMOVE IT
     calendar = { events: [{dt_start: "2015-04-25T11:00:00.000Z", dt_end: "2015-04-25T12:00:00.000Z", summary: "asdf", location: ""}], breaks: [{ dt_start: "2015-04-25T12:00:00.000Z", dt_end: "2015-04-25T16:00:00.000Z", users: ["1234", "123456"]}]};
     showCalendar(calendar);
+    $("#user_id").val(FB.getUserID());
+    $("#upload_ics").submit(function () {
+        event.preventDefault();
+        var form = document.getElementById("upload_ics");
+        var form_data = new FormData(form);
+
+        var fileInput = document.getElementById('file_name');
+        var file = fileInput.files[0];
+        form_data.append('file', file);
+
+        var xhr = new XMLHttpRequest();
+        // Add any event handlers here...
+        xhr.open('POST', "/upload_ics", true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4) {
+                var div = $("#upload_alert");
+                div.append('<button type="button" class="close" data-dismiss="alert">×</button>');
+                if (xhr.status === 200) {
+                    div.addClass("alert-success");
+                    div.text("Great! Your calendar is ready!");
+                } else {
+                    div.addClass("alert-danger");
+                    div.text("Ooops. Something went wrong with uploading your calendar...");
+                }
+                $("#upload_ics")[0].reset();
+                div.show();
+                $(document).trigger("load-stop");
+            }
+        }
+        xhr.send(form_data);
+        $(document).trigger("load-start");
+        return false;
+    });
 }
 
 showDate = function () {

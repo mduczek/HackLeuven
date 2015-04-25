@@ -2,10 +2,15 @@
 
 {% block body %}
 
-<h2 class="header">
-    <i class="mdi-action-today"></i>
-    Your calendar
-</h2>
+<div class="row">
+    <h2 class="header col-xs-11">
+        <i class="mdi-action-today"></i>
+        Your calendar
+    </h2>
+    <div class="col-xs-1">
+        <a data-toggle="modal" data-target="#upload" id="add_calendar" title="Add events to your calendar" class="btn btn-info btn-fab btn-raised mdi-action-settings"></a>
+    </div>
+</div>
 
 <div id="calendar-value">{{ my_cal }}</div>
 
@@ -17,6 +22,38 @@
         <div class="table table-stripped table-hover" id="events">
         </div>
     </div>
+</div>
+
+<div id="upload" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h3 class="modal-title">Manage your calendar</h3>
+            </div>
+            <div class="modal-body">
+
+                <div>
+                    <h4>Upload icalendar file</h4>
+                    <div class="alert alert-dismissable" id="upload_alert"></div>
+                    <div>
+                        <form id="upload_ics" method="post" enctype=multipart/form-data>
+                            <div class="form-group">
+                                <input type="text" readonly="" class="form-control floating-label" placeholder="Browse...">
+                                <input type="file" id="file_name" multiple="">
+                                <input type="hidden" name="user" id="user_id">
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" class="btn btn-primary" value="Upload">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
 </div>
 
 {% endblock %}

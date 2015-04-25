@@ -241,3 +241,6 @@ body.loading .loading-modal {
     width: 50%;
     left: 25%;
 }
+#upload_alert {
+    display: none;
+}
