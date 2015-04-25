@@ -68,8 +68,18 @@
                 <div class="col-xs-3 menu">
                     <nav class="col-xs-12">
                         <ul class="nav navbar-nav">
-                            <li class="withripple"><a href="/calendar">Calendar</a></li>
-                            <li class="withripple"><a href="/settings">Settings</a></li>
+                            <li class="withripple">
+                                <a href="/calendar">
+                                    <i class="mdi-action-today"></i>
+                                    Calendar
+                                </a>
+                            </li>
+                            <li class="withripple">
+                                <a href="/settings">
+                                    <i class="mdi-action-settings"></i>
+                                    Settings
+                                </a>
+                            </li>
                             <li class="withripple"><a href="/about">About</a></li>
                         </ul>
                     </nav>
@@ -99,8 +109,15 @@
                 <div class="pages col-xs-9">
                     <div class="col-xs-10">
                         <div id="page" class="well">
-                            <!-- content loaded dynamically -->
                             {% block body %}
+                            <h2 class="header">Hello!</h2>
+
+                            <p>
+                            Blablablabla
+                            </p>
+
+
+
                             {% endblock %}
                         </div>
                     </div>
