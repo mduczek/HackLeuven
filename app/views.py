@@ -86,6 +86,10 @@ def events_get():
         friends_events.append((friend, db_events_get(friend, None, None)))
     return json.dumps(gaps(user_events, friends_events))
 
+@app.route('/check')
+def check():
+    return str(db_events_get('A', None, None))
+
 def combine_ranges(xs):
     xs = sorted(xs, key=lambda x: x['dt_start'])
     print "combine_ranges >>>> " + str(xs)
@@ -134,7 +138,7 @@ def db_events_get(user, dt_start, dt_end):
     
     es_query = {"query": { "bool": { "must": [
         {   "range": {
-                "dt_start": { "gte": "2013-12-15T00:00:00" }
+                "dt_start": { "gte": "2013-12-15T00:00:00"}
             }
         },
         {   "range": {
@@ -142,14 +146,16 @@ def db_events_get(user, dt_start, dt_end):
             }
         },
         {   "match": {
-                "user": user
+                "uid": user
             }
         }
     ] } } }
 
     r = requests.post(link, data=json.dumps(es_query))
     #es_response_ok(r)
-    return json.loads(r.text)['hits']['hits']
+    print "@@@@" + r.text
+    resp = json.loads(r.text)['hits']['hits']
+    return [ r['_source'] for r in resp ]
 
 
 @app.route('/upload_ics', methods=['GET', 'POST'])

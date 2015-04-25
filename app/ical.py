@@ -55,8 +55,8 @@ def get_events(ics):
 
         ev = {}
         ev['summary'] = ical_ev['SUMMARY'] if ical_ev['SUMMARY'] else ''
-        ev['dt_start'] = (ical_ev['DTSTART'].dt).strftime('%Y-%m-%dT%H:%M%S')
-        ev['dt_end'] = (ical_ev['DTEND'].dt).strftime('%Y-%m-%dT%H:%M%S')
+        ev['dt_start'] = (ical_ev['DTSTART'].dt).strftime('%Y-%m-%dT%H:%M:%S')
+        ev['dt_end'] = (ical_ev['DTEND'].dt).strftime('%Y-%m-%dT%H:%M:%S')
 
         app.logger.debug(ev['summary'])
 
