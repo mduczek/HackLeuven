@@ -72,16 +72,73 @@ def db_events_put(user, ics):
 
     return res
 
+@app.route('/events', methods=['POST'])
+def events_get():
+    from datetime import datetime
+    
+    data = request.get_data()
+    # {user:user1, friends: [user1, user2]}
+    data = json.loads(data)
+
+    user_events = db_events_get(data['user'], None, None)
+    friends_events = []
+    for friend in data['friends']:
+        friends_events.append((friend, db_events_get(friend, None, None)))
+    return json.dumps(gaps(user_events, friends_events))
+
+def combine_ranges(xs):
+    xs = sorted(xs, key=lambda x: x['dt_start'])
+    print "combine_ranges >>>> " + str(xs)
+    if not xs:
+        return xs
+    current = xs[0]
+    combined = []
+    for x in xs[1:]:
+        if current['dt_start'] <= x['dt_start'] and x['dt_start'] <= current['dt_end']:
+            # current['dt_start'] = min(current['dt_start'], x['dt_start'])
+            current['dt_end'] = max(current['dt_end'], x['dt_end'])
+        else:
+            combined.append(current)
+            current = x
+    combined.append(current)
+    return combined
+
+def common_gaps(xs, ys, yname):
+    combined = []
+    combined.extend(xs)
+    combined.extend(ys)
+    combined = combine_ranges(combined)
+    gaps = []
+    dt_start = 0
+    last = 24
+    for x in combined:
+        gaps.append({'dt_start': dt_start, 'dt_end': x['dt_start'], 'user': yname})
+        dt_start = x['dt_end']
+    gaps.append({'dt_start': dt_start, 'dt_end': last, 'user': yname})
+    return gaps
+
+
+def gaps(user_events, friends_events):
+    # user_events = [{'uid': '007', 'dt_start':12, 'dt_end':13, 'summary':'A'}]
+    # friends_events = [ 
+    #     [{'uid': '42', 'dt_start':12, 'dt_end':13, 'summary':'B'}, 
+    #     {'uid': '42', 'dt_start':11, 'dt_end':15, 'summary':'B'}]
+    # ]
+    print "gaps >>>>" + str(user_events) + "||||" + str(friends_events)
+    gaps = [ common_gaps(user_events,friend_events, friend_name) for friend_name, friend_events in friends_events]
+    return gaps
+
+
 def db_events_get(user, dt_start, dt_end):
     link = DB_PATH+'/events/_search?pretty'
     
     es_query = {"query": { "bool": { "must": [
         {   "range": {
-                "dt_start": { "gte": "2013-12-09T00:00:00.000Z" }
+                "dt_start": { "gte": "2013-12-15T00:00:00" }
             }
         },
         {   "range": {
-                "dt_end": { "lte": "2015-12-16T00:00:00.000Z" }
+                "dt_end": { "lte": "2015-12-15T00:00:00"}
             }
         },
         {   "match": {
@@ -92,7 +149,7 @@ def db_events_get(user, dt_start, dt_end):
 
     r = requests.post(link, data=json.dumps(es_query))
     #es_response_ok(r)
-    return r.text
+    return json.loads(r.text)['hits']['hits']
 
 
 @app.route('/upload_ics', methods=['GET', 'POST'])
