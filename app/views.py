@@ -12,7 +12,7 @@ def contact():
 
 @app.route("/settings")
 def settings():
-    return render_template("index.html")
+    return render_template("settings.html")
 
 @app.route("/about")
 def about():

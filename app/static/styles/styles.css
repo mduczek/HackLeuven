@@ -300,3 +300,7 @@ body.loading .loading-modal {
   padding-top: 20px;
 }
 /*footer styling - end*/
+
+#settings-accordion {
+    text-align: left;
+}

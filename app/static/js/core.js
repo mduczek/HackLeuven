@@ -2,7 +2,7 @@ var APP_ID = '359638564247355';
 var APP_NAMESPACE = 'calendar-gap';
 
 var PERMISSIONS = {};
-var DEFAULT_PERMISSIONS = "read_friendlists,publish_actions";
+var DEFAULT_PERMISSIONS = "user_friends";
 
 var DEBUG = true;
 
@@ -18,11 +18,11 @@ var PAGES = [
     , {
         addresses: ["/settings"]
         , login_required: true
+        , main_function: settings_main
     }
 ];
 
 var CURRENT_PAGE = {};
-
 
 $(document).ready(function () {
 
@@ -35,13 +35,7 @@ $(document).ready(function () {
     });
 
     // inicjacja SDK
-    FB.init({
-        appId: APP_ID,
-        frictionlessRequests: true,
-        status: true,
-        version: 'v2.1'
-    });
-    log("inicjacja");
+    FBinit(APP_ID);
 
     var path = window.location.pathname;
     for (i = 0; i < PAGES.length; i++) {
@@ -52,38 +46,13 @@ $(document).ready(function () {
     };
 
     if (CURRENT_PAGE.login_required === true) {
-
-        // obsluga niezbednych eventow
-        FB.Event.subscribe('auth.authResponseChange', onAuthResponseChange);
-        FB.Event.subscribe('auth.statusChange', onStatusChange);
-
-        if (!FB.getUserID())
-            login(loginCallback);
+        FBloginRequired();
     }
-
 });
-
-// obsluga logowania
-function login(callback) {
-    FB.login(callback, { scope: DEFAULT_PERMISSIONS });
-}
 
 function exit() {
     log("exit called");
     //top.location.href = 'https://www.facebook.com/appcenter/' + APP_NAMESPACE;
-}
-
-// callback do logowania
-function loginCallback(response) {
-    log('loginCallback'); log(response);
-    if (response.status != 'connected') {
-        exit();
-    } else {
-        FB.api("/me/permissions", "GET", function (response) {
-            PERMISSIONS = response.data;
-            log(PERMISSIONS);
-        });
-    }
 }
 
 function reRequest(scope, callback) {
@@ -97,78 +66,10 @@ function reRequest(scope, callback) {
         }, { scope: scope, auth_type: 'rerequest' });
 }
 
-var CONFIRM_YES = 1, CONFIRM_NO = 0;
+function main() {
 
-function showConfirmationPopup(message, callback) {
-  var c = confirm(message);
-  if (c) {
-    callback(CONFIRM_YES);
-  } else {
-    callback(CONFIRM_NO);
-  }
-}
-
-// zmienia sie status (aplikacja zostala zaakceptowana przez Usera)
-function onStatusChange(response) {
-    log("onStatusChange");
-    if (response.status != 'connected') {
-        login(loginCallback);
-    } else {
-        reRequestPermissions(DEFAULT_PERMISSIONS, route, exit);
-    }
-}
-
-function reRequestPermissions(permissions, onSuccess, onFailure) {
-    // tu pytamy o dodatkowe uprawnienia, ktorych moze nam brakowac...
-    if (!hasPermission(permissions)) {
-        log("not ok?");
-        if (!PERMISSIONS[permissions]) {
-            PERMISSIONS[permissions] = true;
-            reRequest(permissions, function (x) { 
-                if (hasPermission(permissions)) {
-                    log('xxx');
-                    onSuccess();
-                } else {
-                    log('yyy');
-                    onFailure();
-                }
-            });
-        } else {
-            // pytany, ale nie dal dostepu, wiec wolamy onFailure
-            onFailure();
-        }
-
-    } else {
-        onSuccess();
+    if (CURRENT_PAGE.main_function !== undefined) {
+        CURRENT_PAGE.main_function();
     }
 
-}
-
-function hasPermission(permissions) {
-    log("szukam uprawnien: " + permissions);
-    for (var p in PERMISSIONS) {
-        if (PERMISSIONS[p].permission == permissions
-                && PERMISSIONS[p].status == 'granted') {
-                    log("OK");
-                    return true;
-                }
-    }
-    return false;
-}
-
-// przyszla odpowiedz od uzytkownika
-function onAuthResponseChange(response) {
-    log('onAuthResponseChange', response);
-    loginCallback(response);
-}
-
-// ladujemy odpowiedni plik do containera "#page"
-// po zaladowaniu wywolywany jest callback
-// funkcja wspolna dla wszystkich XXX_main
-// (zawsze chcemy wczytac nowy plik przed jakakolwiek akcja)
-function main(file, callback) {
-    log("main " + file);
-    log(callback);
-    $(document).trigger("load-start");
-    $('#page').load(file, callback);
 }
