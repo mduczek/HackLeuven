@@ -304,3 +304,48 @@ body.loading .loading-modal {
 #settings-accordion {
     text-align: left;
 }
+
+.person {
+    width: 75px;
+    height: 75px;
+    border-radius: calc(75px/2);
+    background-repeat: no-repeat;
+}
+.profile {
+    display: inline-block;
+    width: 75px;
+    margin-right: 25px;
+    margin-bottom: 25px;
+    position: relative;
+}
+.profile.blacklisted .overflow {
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    top: 0px;
+    left: 0px;
+    position: absolute;
+    z-index: 1000;
+}
+.blacklist {
+    border-radius: calc(20px/2);
+    width: 20px;
+    height: 20px;
+    top: 0;
+    right: 0;
+    background: black;
+    color: white !important;
+    position: absolute;
+    text-align: center;
+    font-size: 10px;
+    line-height: 20px;
+    font-weight: bold;
+    visibility: hidden;
+    z-index: 10001;
+}
+.blacklist:hover {
+    cursor: pointer;
+}
+.profile:hover .blacklist {
+    visibility: visible;
+}

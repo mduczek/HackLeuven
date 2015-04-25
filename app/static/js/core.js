@@ -67,7 +67,7 @@ function reRequest(scope, callback) {
 }
 
 function main() {
-
+    log("main");
     if (CURRENT_PAGE.main_function !== undefined) {
         CURRENT_PAGE.main_function();
     }
