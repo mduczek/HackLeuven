@@ -4,3 +4,8 @@ if (typeof String.prototype.startsWith != 'function') {
         return this.indexOf(str) === 0;
     };
 }
+
+function log(txt) {
+    if (DEBUG)
+        console.log(txt);
+}
