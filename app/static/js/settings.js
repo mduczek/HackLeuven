@@ -5,8 +5,6 @@ function settings_main() {
     });
     getFriends();
 
-    $(".blacklist").unbind("click", blacklistClicked).bind("click", blacklistClicked);
-
 };
 var ADD_TOOLTIP = "Add user to blacklist";
 var REM_TOOLTIP = "Remove user from blacklist";
@@ -19,12 +17,11 @@ function getFriends() {
 
     FB.api("/" + id + "/friends?fields=id,name,picture.width(75).height(75)", "GET", function (response) {
         log(response);
-        showFriends(response.data);
+        getBlacklistTbl(response.data);
     });
 }
 
-function showFriends(f) {
-    var blacklisted = getBlacklistTbl();
+function showFriends(f, blacklisted) {
     for (i = 0; i < f.length; i++) {
         var div = $("<div/>", { class: "person" } );
         div.css("background-image", "url(" + f[i].picture.data.url + ")");
@@ -40,17 +37,16 @@ function showFriends(f) {
         x.attr("title", ADD_TOOLTIP);
         profile.append(x);
 
-        if (blacklisted !== undefined) {
-            var index = blacklisted.indexOf(f[i].id);
-            if (index !== -1) {
-                blacklisted.splice(index);
-                profile.addClass("blacklisted");
-                x.attr("title", REM_TOOLTIP);
-            }
+        log("check if blacklisted?");
+        if ($.inArray(f[i].id, blacklisted) !== -1) {
+            profile.addClass("blacklisted");
+            x.attr("title", REM_TOOLTIP);
         }
 
         $("#friends-list").append(profile);
     }
+
+    $(".blacklist").click(blacklistClicked);
 }
 
 function blacklistFriend(f) {
@@ -84,14 +80,12 @@ function updateBlacklistTbl() {
     $(".blacklisted").each(function () {
         blacklisted.blacklisted.push($(this).attr("id"));
     });
-    es_put_id(TBLNAME, FB.getUserID(), blacklisted, function (e) {
-        log(e);
-    });
+    es_put_id(TBLNAME, FB.getUserID(), blacklisted, function (e) {});
 }
-function getBlacklistTbl() {
+function getBlacklistTbl(f) {
     es_get_id(TBLNAME, FB.getUserID(), function (e) {
         var d = JSON.parse(e)._source.blacklisted;
         log(d);
-        return d;
+        showFriends(f, d);
     });
 }

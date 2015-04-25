@@ -318,16 +318,8 @@ body.loading .loading-modal {
     margin-bottom: 25px;
     position: relative;
 }
-.profile.blacklisted:after {
-    content: ".";
-    display: block;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    top: 0px;
-    left: 0px;
-    position: absolute;
-    z-index: 1000;
+.profile.blacklisted .person {
+    opacity: 0.2;
 }
 .blacklist {
     border-radius: calc(20px/2);

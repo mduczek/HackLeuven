@@ -20,19 +20,18 @@ function FBloginRequired() {
 
 // obsluga logowania
 function login(callback) {
+    console.log("login");
     FB.login(callback, { scope: DEFAULT_PERMISSIONS });
 }
 
 // callback do logowania
 function loginCallback(response) {
-    log('loginCallback'); log(response);
     if (response.status != 'connected') {
         exit();
     } else {
         FB.api("/me/permissions", "GET", function (response) {
             PERMISSIONS = response.data;
             log(PERMISSIONS);
-            main();
         });
     }
 }
