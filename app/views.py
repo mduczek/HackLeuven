@@ -31,12 +31,13 @@ def settings():
 def about():
     return render_template("index.html")
 
+DB_PATH = "https://7ti5720l:p1lkxlff673oyj9z@yew-8681597.us-east-1.bonsai.io/leuvenhack"
+
 @app.route('/db', methods=['POST'])
 def db():
-    db_path = "https://7ti5720l:p1lkxlff673oyj9z@yew-8681597.us-east-1.bonsai.io/leuvenhack"
     data = request.get_data()
     db_req = json.loads(data)
-    link = db_path+'/'+db_req['index']
+    link = DB_PATH+'/'+db_req['index']
     if db_req['method'] == 'GET':
         r = requests.get(link)
         return r.text
@@ -49,18 +50,24 @@ def db():
 
 
 DATA_TYPES = namedtuple('DATA_TYPES', "ics, link")(ics='ics', link='link')
-def db_put(user, data_type, data):
+def db_put_cal(user, data_type, data):
     assert data_type in DATA_TYPES
-    link = db_path+'/cals/'+user
+    link = DB_PATH+'/cals/'+user
     entry = {
         'user': user,
         'type': data_type,
         'data': data
     }
-    r = requests.post(link, data=json.dumps(entry))
-    assert r.status_code == requests.codes.ok
+    r = requests.put(link, data=json.dumps(entry))
+    if r.status_code != requests.codes.ok:
+        raise Exception(r.text)
     return r.text
 
+
+def db_get_cal(user):
+    link = DB_PATH+'/cals/'+user
+    r = requests.get(link)
+    return json.loads(r.text)['_source']
 
 @app.route('/upload_ics', methods=['GET', 'POST'])
 def upload_file():
@@ -79,8 +86,11 @@ def upload_file():
             filename = secure_filename(_file.filename)
             ics_str = _file.stream.getvalue().decode("utf-8")
             print ics_str[:200]
-            db_put('007','ics')
-            return make_response('uploaded_file ' + filename)
+            db_put_cal('007','ics', ics_str)
+
+            return make_response('uploaded_file: ' + str(db_get_cal('007')))
+        else:
+            return make_response("invalid file!")
     else:
         return '''
         <!doctype html>
