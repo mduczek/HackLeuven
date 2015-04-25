@@ -84,7 +84,9 @@ def events_get():
     friends_events = []
     for friend in data['friends']:
         friends_events.append((friend, db_events_get(friend, None, None)))
-    return json.dumps(gaps(user_events, friends_events))
+    breaks = gaps(user_events, friends_events)
+
+    return json.dumps({'events': user_events, 'breaks': breaks})
 
 @app.route('/check')
 def check():
