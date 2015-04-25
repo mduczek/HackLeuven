@@ -1,12 +1,15 @@
-from app import app
+from app import app, ical
 from flask import render_template, request
 import requests
 import json
 
+SAMPLE_CAL_URL="https://www.google.com/calendar/ical/9lovau0oeksle7jtms8h094cu8%40group.calendar.google.com/public/basic.ics"
+
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
-    return render_template('index.html')
+    my_cal = ical.convert_from_url(SAMPLE_CAL_URL)
+    return render_template('index.html', my_cal=my_cal)
 
 @app.route("/contact")
 def contact():
