@@ -5,246 +5,128 @@
 /*dark(wet asphalt): #34495e*/
 
 * {
+    box-sizing: border-box;
     font-size: 16px;   
     font-family: 'Lato', sans-serif;
 }
-html, body {
+.header-panel {
+    background-color: #2c3e50;
+    height: 144px;
+    position: relative;
+    z-index: 3;
+}
+.header-panel div {
+    position: relative;
     height: 100%;
-    padding: 0px;
-    margin: 0px;
+}
+.header-panel h1 {
+    color: #FFF;
+    font-weight: 400;
+    position: absolute;
+    bottom: 10px;
+    padding-left: 35px;
+}
+
+.menu {
+    overflow: auto;
+    padding: 0;
+}
+.menu, .menu * {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+.menu ul {
+    padding: 0;
+    margin: 7px 0;
+}
+.menu ul li {
+    list-style: none;
+    padding: 20px 0 20px 50px;
+    font-size: 15px;
+    font-weight: normal;
+    cursor: pointer;
+    display: block;
     width: 100%;
 }
-body {
-    background: #ecf0f1;
+.menu ul li.active {
+    background-color: #dedede;
+    position: relative;
 }
-
-div#bgf-navbar, div#bfg-footer {
-    background: #2c3e50;
-    color: white !important;
-}
-div#bgf-navbar a {
-    color: white !important;
-}
-div#bgf-navbar a:hover {
-    color: #f1c40f !important;
-}
-
-.btn-primary#notify, .btn-primary#copy, .ui-dialog-titlebar {
-    background: #34495e; 
-    color: white;
-}
-
-.content, .body, .files {
-    margin-top: 50px;
-}
-.body {
-    padding-top: 30px;
-}
-#page {
-    padding-bottom: 20px;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-/* ==== list view ==== */
-
-#share {
-    float: right;
-}
-
-.back_to_root {
-    float: left;
-}
-
-.back_to_root, #share {
-	font-size: 30px;
-    color: #f1c40f !important;
-}
-
-.back_to_root:hover, #share:hover {
-    color: #2c3e50 !important;
+.menu ul li a {
+    color: rgb(51, 51, 51);
     text-decoration: none;
-    cursor: pointer;
 }
 
-/*folders - list view styling*/
-
-.list .folder {
-    width: 100%;
-    height: 40px;
-    margin-bottom: 10px;
-    border: 1px solid silver;
-    text-align: center;
-    background: white;
-    border-radius: 5px;
+.pages {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 4;
+    padding: 0;
+    overflow: auto;
+}
+.pages > div {
+    padding: 0 5px;
+    padding-top: 64px;
 }
 
-.list .folder button {
-    float: right;
-    margin-top: 4px;
-    width: 40px;
-    border-left: 1px dashed silver;
-    color: #f1c40f !important;
-}
-.list .folder a {
-    display: block;
-    float: left;
-    width: 80%;
-    color: grey;
-}
-
-.list .folder a .icon {
-    display: block;
-    float: left;
+.pages .header {
+    color: rgb(82, 101, 162);
+    font-size: 24px;
+    font-weight: normal;
     margin-top: 5px;
-    width: 40px;
-    text-align: center;
-    border-right: 1px dashed silver;
-    height: 32px;
+    margin-bottom: 60px;
+    letter-spacing: 1.20000004768372px;
 }
 
-.list .folder a .name {
-    text-align: left;
-    padding-left: 60px;
-    font-weight: bold;
-    font-size: 16px;
-    margin-top: 6px;
-}
-
-/*folders - list view styling - end*/
-
-/* files - list view styling */
-
-.list .file .file-icon-container {
+#page {
+    transform: translateY(0px);
+    transition: all 0.3s ease-out;
     display: block;
-    float: left;
-    margin-top: 2px;
-    margin-left: 6px;
-    margin-right: 4px;
-    padding-right: 4px;
-    text-align: center;
-    border-right: 1px dashed silver;
-}
-.list .file .show-file,
-.list .file .preview-file {
-    float: right;
-    height: 100%;
-    padding-top: 7px;
-    min-width: 60px;
-    padding-left: 4px;
-    padding-right: 4px;
-    border-left: 1px dashed silver;
-    color: #f1c40f !important;
-}
-.list .file .show-file a,
-.list .file .preview-file a {
-    color: #f1c40f !important;
-}
-.list .file .show-file:hover,
-.list .file .preview-file:hover {
-    cursor: pointer;
-}
-.list .file {
-    width: 100%;
-    height: 40px;
-    margin-bottom: 10px;
-    border: 1px solid silver;
-    text-align: center;
-    background: white;
-    border-radius: 5px;
+    opacity: 1;
 }
 
-.list .file .date {
-    float: left;
-    height: 100%;
-    font-style: italic;
-    padding-top: 7px;
-    color: #34495e;
-    margin-left: 5px;
-    padding-right: 10px;
-    width: 155px;
-    text-align: center;
-    border-right: 1px dashed silver;
-}
-.list .file .name {
-    padding-right: 10px;
-    border-right: 1px dashed silver;
-}
-.list .file .name, .list .file .post {
-    float: left;
-    height: 100%;
-    padding-top: 7px;
-    color: #34495e;
-    margin-left: 5px;
-    max-width: 60%;
-}
-.list .file .post {
-    padding-top: 4px;
-    font-size: 10px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2; /* number of lines to show N */
-    line-height: 15px;        /* fallback X */
-    max-height: 35px;       /* fallback N*X */
-    color: #888888;
-    text-align: left;
-}
-.list .file .post:after {
-    content: "...";
-    font-size: 10px;
-    line-height: 15px;
-}
+/** {*/
+/*}*/
+/*html, body {*/
+/*height: 100%;*/
+/*padding: 0px;*/
+/*margin: 0px;*/
+/*width: 100%;*/
+/*}*/
+/*body {*/
+/*background: #ecf0f1;*/
+/*}*/
 
-/* files - list view styling - end */
+/*div#bgf-navbar, div#bfg-footer {*/
+/*background: #2c3e50;*/
+/*color: white !important;*/
+/*}*/
+/*div#bgf-navbar a {*/
+/*color: white !important;*/
+/*}*/
+/*div#bgf-navbar a:hover {*/
+/*color: #f1c40f !important;*/
+/*}*/
 
-.iframe {
-    display: inline-block;
-    width: 100%;
-    height: 95%;
-    border: none;
-}
+/*.btn-primary#notify, .btn-primary#copy, .ui-dialog-titlebar {*/
+/*background: #34495e; */
+/*color: white;*/
+/*}*/
 
-.folder .starred {
-    color: papayawhip;
-}
-#starred_view {
-    margin-bottom: 40px;
-}
-#view, #view_files {
-    margin-top: 40px;
-}
+/*.content, .body, .files {*/
+/*margin-top: 50px;*/
+/*}*/
+/*.body {*/
+/*padding-top: 30px;*/
+/*}*/
+/*#page {*/
+/*padding-bottom: 20px;*/
+/*margin-bottom: 20px;*/
+/*text-align: center;*/
+/*}*/
 
-/*file icons - custom definitions*/
-.file-icon[data-type=other] {
-  background: #34495e;
-}
-.file-icon[data-type=gz],
-.file-icon[data-type=gzip],
-.file-icon[data-type=tgz] {
-  background: #ACACAC;
-}
-.file-icon[data-type=gdoc] {
-    background: #3980fa;
-}
-.file-icon[data-type=gsheet] {
-    background: #039c52;
-}
-.file-icon[data-type=gpres] {
-    background: #f5b402;
-}
-.file-icon[data-type=gmap],
-.file-icon[data-type=gdraw] {
-    background: #de4231;
-}
-.file-icon[data-type=gdrive] {
-    background: #cc338c;
-}
-.file-icon[data-type=dropbox] {
-    background: #007ee5;
-}
-/*file icons - custom definitions - end*/
 
 /*loading - modal*/
 .loading-modal {
@@ -256,9 +138,9 @@ div#bgf-navbar a:hover {
     height:     100%;
     width:      100%;
     background: rgba( 255, 255, 255, .8 ) 
-                url('http://i.stack.imgur.com/FhHRx.gif') 
-                50% 50% 
-                no-repeat;
+    url('http://i.stack.imgur.com/FhHRx.gif') 
+    50% 50% 
+    no-repeat;
     text-align: center;
 }
 .loading-modal h3 {
@@ -276,30 +158,6 @@ body.loading .loading-modal {
     display: block;
 }
 /*loading - modal - end*/
-
-/*footer styling*/
-.wrapper {
-    min-height: 100%;
-    position: relative;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 0;
-    margin: 0;
-    padding-bottom: 300px;
-}
-#footer {
-  width:100%;
-  height:300px;
-  position:absolute;
-  bottom:0px;
-  left:0;
-  background: #2c3e50;
-  color: white;
-  padding-top: 20px;
-}
-/*footer styling - end*/
 
 #settings-accordion {
     text-align: left;

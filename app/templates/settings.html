@@ -2,25 +2,35 @@
 
 {% block body %}
 
-<h2>Settings</h2>
+<h2 class="header">Settings</h2>
 
 <div id="settings-accordion">
 
-    <h3>Permissions</h3>
-    <div>
-        <p>
+    <div class="panel panel-default">
+        <div class="panel-heading">Permissions</div>
+        <div class="panel-body">
+            <p>
             Nothing to do here, right now.
-        </p>
+            </p>
+        </div>
     </div>
 
-    <h3>Friends</h3>
-    <div>
-        <p>
-            This list shows all your friends that uses the application. You can add them to the blacklist, so they would not see your schedule. <strong>Remember! You would not see them, either!</strong>
-        </p>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3>
+                <i class="mdi-social-people"></i>
+                Friends & blacklisting
+            </h3>
+        </div>
+        <div class="panel-body">
+            <p>
+            This list shows all your friends that uses the application. You can add them to the blacklist, so they would not see your schedule.
+            <strong class="text-danger">Remember! You would not see them, either!</strong>
+            </p>
 
-        <div id="friends-list">
+            <div id="friends-list">
 
+            </div>
         </div>
     </div>
 

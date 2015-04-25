@@ -1,8 +1,5 @@
 function settings_main() {
     log("Settings, alrighty!");
-    $("#settings-accordion").accordion({
-        heightStyle: "content"
-    });
     getFriends();
 
 };
