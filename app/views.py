@@ -49,6 +49,10 @@ def db():
         return r.text
 
 
+def es_response_ok(r):
+    if r.status_code != requests.codes.ok:
+        raise Exception(r.text)
+
 DATA_TYPES = namedtuple('DATA_TYPES', "ics, link")(ics='ics', link='link')
 def db_put_cal(user, data_type, data):
     assert data_type in DATA_TYPES
@@ -59,15 +63,62 @@ def db_put_cal(user, data_type, data):
         'data': data
     }
     r = requests.put(link, data=json.dumps(entry))
-    if r.status_code != requests.codes.ok:
-        raise Exception(r.text)
+    es_response_ok(r)
     return r.text
-
 
 def db_get_cal(user):
     link = DB_PATH+'/cals/'+user
     r = requests.get(link)
     return json.loads(r.text)['_source']
+
+def db_events_put(user, ics):
+    events = []
+    events.append({
+        'dt_start': '2014-05-12T00:00:00.000Z', 
+        'dt_end':   '2014-05-13T00:00:00.000Z', 
+        'title': 'A',
+        'user': '007'
+        })
+    events.append({
+        'dt_start': '2014-05-14T00:00:00.000Z', 
+        'dt_end':   '2014-05-15T00:00:00.000Z', 
+        'title': 'B',
+        'user': '007'
+        })
+    link = DB_PATH+'/events/'
+    res = ''
+    for event in events:
+        r = requests.post(link, data=json.dumps(event))
+        #es_response_ok(r)
+        res += r.text +"||||"
+    return res
+
+def db_events_get(user, dt_start, dt_end):
+    link = DB_PATH+'/events/_search?pretty'
+    
+    es_query = {"query": { "bool": { "must": [
+        {   "range": {
+                "dt_start": { "gte": "2013-12-09T00:00:00.000Z" }
+            }
+        },
+        {   "range": {
+                "dt_end": { "lte": "2015-12-16T00:00:00.000Z" }
+            }
+        },
+        {   "match": {
+                "user": user
+            }
+        }
+    ] } } }
+
+    r = requests.post(link, data=json.dumps(es_query))
+    es_response_ok(r)
+    return r.text
+
+@app.route('/check', methods=['GET'])
+def check():
+    db_events_put('007', None)
+    return make_response('uploaded_file: ' + str(db_events_get('007', None, None)))
 
 @app.route('/upload_ics', methods=['GET', 'POST'])
 def upload_file():
@@ -86,9 +137,10 @@ def upload_file():
             filename = secure_filename(_file.filename)
             ics_str = _file.stream.getvalue().decode("utf-8")
             print ics_str[:200]
-            db_put_cal('007','ics', ics_str)
+            #db_put_cal('007','ics', ics_str)
+            db_events_put('007', None)
 
-            return make_response('uploaded_file: ' + str(db_get_cal('007')))
+            return make_response('uploaded_file: ' + str(db_events_get('007', None, None)))
         else:
             return make_response("invalid file!")
     else:
