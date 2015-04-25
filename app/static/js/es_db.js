@@ -11,7 +11,7 @@ function _es_db(db_req, callback) {
         data: db_req,
         success: function(data) {
             console.log(data);
-            callback();
+            callback(data);
         },
         error: function(error) {
             console.log(error.responseText);

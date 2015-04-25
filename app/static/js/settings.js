@@ -24,6 +24,7 @@ function getFriends() {
 }
 
 function showFriends(f) {
+    var blacklisted = getBlacklistTbl();
     for (i = 0; i < f.length; i++) {
         var div = $("<div/>", { class: "person" } );
         div.css("background-image", "url(" + f[i].picture.data.url + ")");
@@ -39,6 +40,15 @@ function showFriends(f) {
         x.attr("title", ADD_TOOLTIP);
         profile.append(x);
 
+        if (blacklisted !== undefined) {
+            var index = blacklisted.indexOf(f[i].id);
+            if (index !== -1) {
+                blacklisted.splice(index);
+                profile.addClass("blacklisted");
+                x.attr("title", REM_TOOLTIP);
+            }
+        }
+
         $("#friends-list").append(profile);
     }
 }
@@ -47,17 +57,9 @@ function blacklistFriend(f) {
     var id = f.parent().attr("id");
     var p = $("#" + id);
     p.addClass("blacklisted");
-    p.append($("<div />", { class: "overflow" }));
     f.attr("title", REM_TOOLTIP);
     log(id);
-
-    var blacklisted = { blacklisted: [] };
-    $(".blacklisted").each(function () {
-        blacklisted.blacklisted.push($(this).attr("id"));
-    });
-    es_put_id(TBLNAME, FB.getUserID(), blacklisted, function (e) {
-        log(e);
-    });
+    updateBlacklistTbl();
 }
 function unblacklistFriend(f) {
     var id = f.parent().attr("id");
@@ -66,6 +68,7 @@ function unblacklistFriend(f) {
     p.find(".overflow").remove();
     f.attr("title", ADD_TOOLTIP);
     log(id);
+    updateBlacklistTbl();
 }
 function blacklistClicked() {
     if ($(this).parent().attr("class").indexOf("blacklisted") === -1) {
@@ -75,4 +78,20 @@ function blacklistClicked() {
         log("not blacklist");
         unblacklistFriend($(this));
     }
+}
+function updateBlacklistTbl() {
+    var blacklisted = { blacklisted: [] };
+    $(".blacklisted").each(function () {
+        blacklisted.blacklisted.push($(this).attr("id"));
+    });
+    es_put_id(TBLNAME, FB.getUserID(), blacklisted, function (e) {
+        log(e);
+    });
+}
+function getBlacklistTbl() {
+    es_get_id(TBLNAME, FB.getUserID(), function (e) {
+        var d = JSON.parse(e)._source.blacklisted;
+        log(d);
+        return d;
+    });
 }
