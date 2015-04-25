@@ -6,6 +6,23 @@ var DEFAULT_PERMISSIONS = "read_friendlists,publish_actions";
 
 var DEBUG = true;
 
+var PAGES = [
+    {
+        addresses: ["/index", "/"]
+        , login_required: false
+    }
+    , {
+        addresses: ["/contact"]
+        , login_required: false
+    }
+    , {
+        addresses: ["/settings"]
+        , login_required: true
+    }
+];
+
+var CURRENT_PAGE = {};
+
 
 $(document).ready(function () {
 
@@ -26,17 +43,24 @@ $(document).ready(function () {
     });
     log("inicjacja");
 
-    // obsluga niezbednych eventow
-    FB.Event.subscribe('auth.authResponseChange', onAuthResponseChange);
-    FB.Event.subscribe('auth.statusChange', onStatusChange);
+    var path = window.location.pathname;
+    for (i = 0; i < PAGES.length; i++) {
+        if ($.inArray(path, PAGES[i].addresses) !== -1) { // znalazlo odpowiednia strone!
+            CURRENT_PAGE = PAGES[i];
+            i = PAGES.length; // wyjscie
+        }
+    };
 
-    if (!FB.getUserID())
-        login(loginCallback);
+    if (CURRENT_PAGE.login_required === true) {
 
-});
+        // obsluga niezbednych eventow
+        FB.Event.subscribe('auth.authResponseChange', onAuthResponseChange);
+        FB.Event.subscribe('auth.statusChange', onStatusChange);
 
-$(window).on('hashchange', function() {
-    route();
+        if (!FB.getUserID())
+            login(loginCallback);
+    }
+
 });
 
 // obsluga logowania
@@ -136,25 +160,6 @@ function hasPermission(permissions) {
 function onAuthResponseChange(response) {
     log('onAuthResponseChange', response);
     loginCallback(response);
-}
-
-//routing - opisuje jak maja sie zmieniac strony i ich zawartosc zgodnie z kliknieciami usera (operujemy na hashu)
-//wolane zawsze w momencie kiedy mamy zmiane statusu aplikacji (a user jest zalogowany)
-function route() {
-    var hash = window.location.hash;
-    log("window location hash:")
-    log(hash);
-
-    switch(hash) {
-        
-        case "":
-        case "#groups":
-            log("main page");
-            //main("/content/groups.html", groups_main);
-        break;
-        default:
-            log("default screen");
-    }
 }
 
 // ladujemy odpowiedni plik do containera "#page"
