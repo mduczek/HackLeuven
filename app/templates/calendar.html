@@ -6,6 +6,21 @@
     <i class="mdi-action-today"></i>
     Your calendar
 </h2>
-{{ my_cal }}
+
+<div id="calendar-value">{{ my_cal }}</div>
+
+<div class="panel panel-info" id="calendar">
+    <div class="panel-heading">
+        <h3></h3>
+    </div>
+    <div class="panel-body">
+        <div class="table table-stripped table-hover" id="events">
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
 
 {% endblock %}

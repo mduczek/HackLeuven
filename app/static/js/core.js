@@ -20,6 +20,11 @@ var PAGES = [
         , login_required: true
         , main_function: settings_main
     }
+    , {
+        addresses: ["/calendar"]
+        , login_required: true
+        , main_function: calendar_main
+    }
 ];
 
 var CURRENT_PAGE = {};

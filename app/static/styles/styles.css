@@ -201,3 +201,43 @@ body.loading .loading-modal {
 .profile:hover .blacklist {
     visibility: visible;
 }
+#calendar-value {
+    display: none;
+}
+#calendar h3 span {
+    font-size: 25px;
+}
+#events {
+    position: relative;
+}
+.hour {
+    min-height: 50px;
+    border-bottom: 1px solid silver;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    position: relative;
+}
+.hour div {
+    position: relative;
+    z-index: 1000;
+}
+.hour:last-of-type {
+    border-bottom: none;
+}
+.hour.current {
+    background: #ecf1b2;
+}
+.hour .current-line {
+    position: absolute;
+    height: 3px;
+    background: #cddc39;
+    left: 0px;
+    width: 100%;
+    z-index: 10;
+}
+.event {
+    background: #e0e0e0;
+    position: absolute;
+    width: 50%;
+    left: 25%;
+}
