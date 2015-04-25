@@ -7,7 +7,6 @@ from urllib import urlopen
 
 from app import app
 
-
 def convert_from_url(url):
     if not url.startswith('http'):
         url = 'http://%s' % url
