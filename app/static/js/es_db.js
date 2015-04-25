@@ -27,6 +27,14 @@ es_put = function(type_name, data, callback) {
     _es_db(db_req, callback);
 };
 
+es_put_id = function(type_name, id, data, callback) {
+    var db_req = JSON.stringify({
+        index: type_name + "/" + id,
+        method: 'PUT',
+        query: JSON.stringify(data)});
+    _es_db(db_req, callback);
+};
+
 es_get_id = function(type_name, id, callback) {
     var db_req = JSON.stringify({
         index: type_name + "/" + id,
