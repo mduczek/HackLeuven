@@ -5,7 +5,7 @@ from flask import render_template, request, make_response
 from collections import namedtuple
 
 from app import app
-from ical import convert_from_url
+from ical import convert_from_url, get_events
 
 SAMPLE_CAL_URL="https://www.google.com/calendar/ical/9lovau0oeksle7jtms8h094cu8%40group.calendar.google.com/public/basic.ics"
 
@@ -49,48 +49,27 @@ def db():
         return r.text
 
 
-def es_response_ok(r):
-    if r.status_code != requests.codes.ok:
-        raise Exception(r.text)
-
 DATA_TYPES = namedtuple('DATA_TYPES', "ics, link")(ics='ics', link='link')
-def db_put_cal(user, data_type, data):
-    assert data_type in DATA_TYPES
-    link = DB_PATH+'/cals/'+user
-    entry = {
-        'user': user,
-        'type': data_type,
-        'data': data
-    }
-    r = requests.put(link, data=json.dumps(entry))
-    es_response_ok(r)
-    return r.text
-
-def db_get_cal(user):
-    link = DB_PATH+'/cals/'+user
-    r = requests.get(link)
-    return json.loads(r.text)['_source']
 
 def db_events_put(user, ics):
-    events = []
-    events.append({
-        'dt_start': '2014-05-12T00:00:00.000Z', 
-        'dt_end':   '2014-05-13T00:00:00.000Z', 
-        'title': 'A',
-        'user': '007'
-        })
-    events.append({
-        'dt_start': '2014-05-14T00:00:00.000Z', 
-        'dt_end':   '2014-05-15T00:00:00.000Z', 
-        'title': 'B',
-        'user': '007'
-        })
+    link = DB_PATH+'/events/_query'
+    es_query = { "query" : { "term" : { "uid" : user }}}
+
+    r = requests.delete(link, data=json.dumps(es_query))
+
+    # upload
+    events = get_events(ics)
+    for event in events:
+        event['uid'] = user
+
     link = DB_PATH+'/events/'
     res = ''
     for event in events:
         r = requests.post(link, data=json.dumps(event))
-        #es_response_ok(r)
+        if r.status_code != requests.codes.created:
+            raise Exception(r.text)
         res += r.text +"||||"
+
     return res
 
 def db_events_get(user, dt_start, dt_end):
@@ -112,13 +91,9 @@ def db_events_get(user, dt_start, dt_end):
     ] } } }
 
     r = requests.post(link, data=json.dumps(es_query))
-    es_response_ok(r)
+    #es_response_ok(r)
     return r.text
 
-@app.route('/check', methods=['GET'])
-def check():
-    db_events_put('007', None)
-    return make_response('uploaded_file: ' + str(db_events_get('007', None, None)))
 
 @app.route('/upload_ics', methods=['GET', 'POST'])
 def upload_file():
@@ -132,15 +107,15 @@ def upload_file():
 
     if request.method == 'POST':
         _file = request.files['file']
+        user = request.form['user']
         print _file.filename
         if _file and allowed_file(_file.filename):
             filename = secure_filename(_file.filename)
             ics_str = _file.stream.getvalue().decode("utf-8")
             print ics_str[:200]
-            #db_put_cal('007','ics', ics_str)
-            db_events_put('007', None)
+            db_events_put(user, ics_str)
 
-            return make_response('uploaded_file: ' + str(db_events_get('007', None, None)))
+            return make_response('uploaded_file: ' + str(db_events_get(user, None, None)))
         else:
             return make_response("invalid file!")
     else:
@@ -150,6 +125,7 @@ def upload_file():
         <h1>Upload new File</h1>
         <form action="" method=post enctype=multipart/form-data>
           <p><input type=file name=file accept=".ics">
+             <input type=text name=user>
              <input type=submit value=Upload>
         </form>
         '''

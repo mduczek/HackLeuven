@@ -2,7 +2,8 @@ import json
 import os
 
 from flask import abort
-from icalendar import Calendar, vDatetime
+from icalendar import Calendar, vDatetime, Event
+from icalendar.cal import Component
 from urllib import urlopen
 
 from app import app
@@ -20,7 +21,15 @@ def convert_from_url(url):
     return to_json(ics)
 
 def to_json(ics):
-    ical = Calendar.from_string(ics)
+    ical = Calendar.from_ical(ics)
+    iev = Event.from_ical(ics)
+
+    for ev in ical.walk("VEVENT"):
+        app.logger.debug(ev["SUMMARY"])
+        app.logger.debug(ev["DTSTART"].dt)
+        app.logger.debug(ev["DTEND"].dt)
+        #app.logger.debug(ev["LOCATION"])
+        app.logger.debug(type(ev['DTEND'].dt))
 
     data = {}
     data[ical.name] = dict(ical.items())
@@ -32,8 +41,27 @@ def to_json(ics):
             comp_obj[item[0]] = unicode(item[1])
             data[ical.name][component.name].append(comp_obj)
 
-    app.logger.debug(json.dumps(data))
+    # app.logger.debug(json.dumps(data))
 
     return json.dumps(data)
+
+def get_events(ics):
+    ical = Calendar.from_ical(ics)
+
+    events = []
+    for ical_ev in ical.walk('VEVENT'):
+        if not ical_ev['DTSTART'] or not ical_ev['DTEND']:
+            continue
+
+        ev = {}
+        ev['summary'] = ical_ev['SUMMARY'] if ical_ev['SUMMARY'] else ''
+        ev['dt_start'] = (ical_ev['DTSTART'].dt).strftime('%d/%m/%Y %H:%M')
+        ev['dt_end'] = (ical_ev['DTEND'].dt).strftime('%d/%m/%Y %H:%M')
+
+        app.logger.debug(ev['summary'])
+
+        events.append(ev)
+
+    return events
 
 #def intersect(my_cal, other_cals):
