@@ -16,8 +16,7 @@ def index():
 
 @app.route("/calendar")
 def calendar():
-    cal = convert_from_url(SAMPLE_CAL_URL)
-    return render_template("calendar.html", my_cal=cal)
+    return render_template("calendar.html")
 
 @app.route("/contact")
 def contact():

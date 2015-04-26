@@ -120,6 +120,7 @@ showCalendar = function (calendar) {
 
     log(calendar);
     $("#events").empty();
+    var i;
 
     for (i = 0; i < 24; i++) {
         $("#events").append($("<div/>", {class: "hour" + i + " hour row"}).append($("<div/>", {class: "time col-xs-3"}).text(i + ":00")));
@@ -130,31 +131,47 @@ showCalendar = function (calendar) {
     }, 60*1000);
 
     var dt_start = {}, dt_end = {};
+
+    var getTime = function(dateStr) {
+        var res = {hour:undefined, minutes:undefined};
+        var tmp = dateStr.split(" ")[1];
+        tmp = tmp.split(":");
+        res.hour = tmp[0];
+        if (res.hour[0] === "0") res.hour = res.hour.substr(1);
+        res.minutes = tmp[1];
+        if (res.minutes[0] === "0") res.minutes = res.minutes.substr(1);
+        return res
+    };
+
+    var getContainer = function(dt_start, dt_end) {
+        var event_container = $("<div/>", { class: "event panel" });
+        var start = $(".hour" + dt_start.hour);
+        log(start);
+        var t = start.position().top + ((dt_start.minutes/60) *  start.outerHeight());
+        var end = $(".hour" + dt_end.hour);
+        var e = (end.position().top +  + ((dt_end.minutes/60) *  end.outerHeight())) - t;
+        event_container.css("top", t + "px");
+        event_container.css("height", e + "px");
+        return event_container;
+    };
+
     for (i = 0; i < calendar.events.length; i++) {
-         var tmp = calendar.events[i].dt_start.split(" ")[1];
-         tmp = tmp.split(":");
-         dt_start.hour = tmp[0];
-         if (dt_start.hour[0] === "0") dt_start.hour = dt_start.hour.substr(1);
-         dt_start.minutes = tmp[1];
-         if (dt_start.minutes[0] === "0") dt_start.minutes = dt_start.minutes.substr(1);
+         dt_start = getTime(calendar.events[i].dt_start);
+         dt_end = getTime(calendar.events[i].dt_end);
 
-         tmp = calendar.events[i].dt_end.split(" ")[1];
-         tmp = tmp.split(":");
-         dt_end.hour = tmp[0];
-         if (dt_end.hour[0] === "0") dt_end.hour = dt_end.hour.substr(1);
-         dt_end.minutes = tmp[1];
-         if (dt_end.minutes[0] === "0") dt_end.minutes = dt_end.minutes.substr(1);
-
-         var event_container = $("<div/>", { class: "event panel" });
-         var start = $(".hour" + dt_start.hour);
-         log(start);
-         var t = start.position().top + ((dt_start.minutes/60) *  start.outerHeight());
-         var end = $(".hour" + dt_end.hour);
-         var e = (end.position().top +  + ((dt_end.minutes/60) *  end.outerHeight())) - t;
-         event_container.css("top", t + "px");
-         event_container.css("height", e + "px");
+         var event_container = getContainer(dt_start, dt_end);
          event_container.append($("<div/>", { class: "panel-body" }).text(calendar.events[i].summary));
          $("#events").append(event_container);
+    }
+
+    for (i = 0; i < calendar.breaks.length; i++ ) {
+        var brk = calendar.breaks[i];
+        dt_start = getTime(brk.dt_start);
+        dt_end = getTime(brk.dt_end);
+
+        var event_container = getContainer(dt_start, dt_end);
+        event_container.append($("<div/>", { class: "panel-body" }).text("Break with: " + brk.user));
+        $("#events").append(event_container);
     }
 
 }
