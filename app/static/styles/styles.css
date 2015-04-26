@@ -260,7 +260,7 @@ body.loading .loading-modal {
     left: 25%;
 }
 .event.panel-light {
-    background: transparent;
+    background: rgba(255, 255, 255, 0.7);
 }
 #upload_alert {
     display: none;

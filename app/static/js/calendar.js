@@ -183,11 +183,18 @@ showCalendar = function (calendar) {
         log(start);
         var t = start.position().top + ((dt_start.minutes/60) *  start.outerHeight());
         var end = $(".hour" + dt_end.hour);
-        var e = (end.position().top +  + ((dt_end.minutes/60) *  end.outerHeight())) - t;
-
+        var e = (end.position().top + ((dt_end.minutes/60) *  end.outerHeight())) - t;
         var event_container;
         event_container = $("<div/>", { class: "event panel" });
+        if (e <= 0) {
+            end = $(".hour23");
+            e = end.position().top - t;
+            event_container.css("margin-left", "100px");
+        }
+
+
         event_container.css("top", t + "px");
+
         event_container.css("height", e + "px");
         if (brk) {
             var brkclass = "brk";

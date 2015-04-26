@@ -28,6 +28,7 @@ var CURRENT_PAGE = {};
 var DEBUG = true;
 
 var fb_APP_ID = '359638564247355';
+var fb_APP_SECRET = '15cc18c98ac398c0a428bb034d37ca43'; // naaasty thingieees
 var fb_APP_NAMESPACE = 'calendar-gap';
 var fb_PERMISSIONS = {};
 var fb_DEFAULT_PERMISSIONS = "user_friends";
@@ -90,4 +91,11 @@ function main() {
         CURRENT_PAGE.main_function();
     }
 
+}
+
+function send_notification(uid, message) {
+    var access_token = fb_APP_ID + "|" + fb_APP_SECRET;
+    FB.api('/' + uid + '/notifications?access_token=' + access_token
+        + '&href=/calendar&template=' + message, 'POST',
+        function(response) { console.log(response); })
 }
