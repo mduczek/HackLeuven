@@ -254,6 +254,7 @@ showCalendar = function (calendar) {
                 title: "Last known location..."
             });
             google.maps.event.trigger(map, 'resize');
+            map.setCenter(myLatlng);
         });
     }
 
