@@ -245,7 +245,7 @@ showCalendar = function (calendar) {
                 center: myLatlng,       
                 mapTypeId: google.maps.MapTypeId.ROADMAP  
             };
-            var map = new google.maps.Map2(el, options);  
+            var map = new google.maps.Map(el, options);  
             map.setCenter(myLatlng);
             google.maps.event.trigger(map, 'resize');
 
