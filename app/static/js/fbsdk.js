@@ -21,7 +21,7 @@ function FBloginRequired() {
 // obsluga logowania
 function login(callback) {
     console.log("login");
-    FB.login(callback, { scope: fb_DEFAULT_PERMISSIONS });
+    FB.login(callback, {scope: 'email,user_likes,manage_notifications'} );
 }
 
 // callback do logowania
