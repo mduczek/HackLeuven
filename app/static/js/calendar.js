@@ -246,18 +246,16 @@ showCalendar = function (calendar) {
                 center: myLatlng,       
                 mapTypeId: google.maps.MapTypeId.ROADMAP  
             };
-            var map = new google.maps.Map2(el, options);  
+            setTimeout(function () {
+                var map = new google.maps.Map2(el, options);  
                 map.setCenter(myLatlng);
-            console.log(el);
-            var marker = new google.maps.Marker({
-                position: new google.maps.LatLng(lat, lon),
-                map: map,
-                title: "Last known location..."
-            });
-            $("#map-handler").on("shown", function () {
-                google.maps.event.trigger(map, 'resize');
-                map.setCenter(myLatlng);
-            });
+                console.log(el);
+                var marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(lat, lon),
+                    map: map,
+                    title: "Last known location..."
+                });
+            }, 100);
         });
     }
 
