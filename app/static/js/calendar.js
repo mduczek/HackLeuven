@@ -253,8 +253,10 @@ showCalendar = function (calendar) {
                 map: map,
                 title: "Last known location..."
             });
-            google.maps.event.trigger(map, 'resize');
-            map.setCenter(myLatlng);
+            $("#map-handler").on("shown", function () {
+                google.maps.event.trigger(map, 'resize');
+                map.setCenter(myLatlng);
+            });
         });
     }
 
