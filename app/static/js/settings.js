@@ -3,10 +3,6 @@ function settings_main() {
     getFriends(getBlacklistTbl);
 
 };
-var ADD_TOOLTIP = "Add user to blacklist";
-var REM_TOOLTIP = "Remove user from blacklist";
-var TBLNAME1 = "Blacklist_cant_see_me";
-var TBLNAME2 = "Blacklist_cant_see_them";
 
 function showFriends(f, blacklisted) {
     for (i = 0; i < f.length; i++) {
@@ -21,13 +17,13 @@ function showFriends(f, blacklisted) {
 
         var x = $("<div/>", { class: "blacklist" });
         x.text("X");
-        x.attr("title", ADD_TOOLTIP);
+        x.attr("title", blacklist_ADD_TOOLTIP);
         profile.append(x);
 
         log("check if blacklisted?");
         if ($.inArray(f[i].id, blacklisted) !== -1) {
             profile.addClass("blacklisted");
-            x.attr("title", REM_TOOLTIP);
+            x.attr("title", blacklist_REM_TOOLTIP);
         }
 
         $("#friends-list").append(profile);
@@ -40,20 +36,20 @@ function blacklistFriend(f) {
     var id = f.parent().attr("id");
     var p = $("#" + id);
     p.addClass("blacklisted");
-    f.attr("title", REM_TOOLTIP);
+    f.attr("title", blacklist_REM_TOOLTIP);
     log(id);
-    updateBlacklistTbl(TBLNAME1, FB.getUserID(), id, true);
-    updateBlacklistTbl(TBLNAME2, id, FB.getUserID(), true);
+    updateBlacklistTbl(blacklist_TBLNAME1, FB.getUserID(), id, true);
+    updateBlacklistTbl(blacklist_TBLNAME2, id, _B.getUserID(), true);
 }
 function unblacklistFriend(f) {
     var id = f.parent().attr("id");
     var p = $("#" + id);
     p.removeClass("blacklisted");
     p.find(".overflow").remove();
-    f.attr("title", ADD_TOOLTIP);
+    f.attr("title", blacklist_ADD_TOOLTIP);
     log(id);
-    updateBlacklistTbl(TBLNAME1, FB.getUserID(), id, false);
-    updateBlacklistTbl(TBLNAME2, id, FB.getUserID(), false);
+    updateBlacklistTbl(blacklist_TBLNAME1, FB.getUserID(), id, false);
+    updateBlacklistTbl(blacklist_TBLNAME2, id, FB.getUserID(), false);
 }
 function blacklistClicked() {
     if ($(this).parent().attr("class").indexOf("blacklisted") === -1) {
@@ -80,7 +76,7 @@ function updateBlacklistTbl(TBLNAME, who, upd_id, add) {
     });
 }
 function getBlacklistTbl(f) {
-    es_get_id(TBLNAME1, FB.getUserID(), function (e) {
+    es_get_id(blacklist_TBLNAME1, FB.getUserID(), function (e) {
         var d = [];
         if (JSON.parse(e).found !== false) {
             d = JSON.parse(e)._source.blacklisted;

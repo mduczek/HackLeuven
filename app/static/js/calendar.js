@@ -2,7 +2,7 @@ calendar_main = function () {
     log("calendar_main");
 
     showDate();
-    setInterval(function() { showDate(); }, 60*1000);
+    setInterval(function() { showDate(); }, 10*60*1000);
 
     $("#add_calendar").click(function () {
         $("#upload_alert").hide().removeClass("alert-danger").removeClass('alert-succes').text("");
@@ -53,7 +53,7 @@ getEvents = function (friends) {
         f.push(friends[j].id);
     }
     var id = FB.getUserID();
-    es_get_id(TBLNAME1, id, function (e) {
+    es_get_id(blacklist_TBLNAME1, id, function (e) {
         var d = [];
         if (JSON.parse(e).found !== false) {
             d = JSON.parse(e)._source.blacklisted;
@@ -92,6 +92,15 @@ showDate = function () {
           + ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][date.getDay()]
           ;
     $("#calendar h3").text(d);
+
+    $.get(weather_ENDPOINT + "weather?q=Warsaw&APPID=" + weather_API_KEY, function (data) {
+        log(data);
+        var img = $("<div/>", { class: "weather" });
+        var pic = weather_ICON + data.weather[0].icon + ".png";
+        img.css("background-image", "url(" + pic + ")");
+        img.html((parseInt(data.main.temp) - 273.15).toFixed(1) + "&deg;C");
+        $("#calendar h3").append(img);
+    });
 }
 
 setCurrent = function () {

@@ -21,7 +21,7 @@ function FBloginRequired() {
 // obsluga logowania
 function login(callback) {
     console.log("login");
-    FB.login(callback, { scope: DEFAULT_PERMISSIONS });
+    FB.login(callback, { scope: fb_DEFAULT_PERMISSIONS });
 }
 
 // callback do logowania
@@ -30,8 +30,8 @@ function loginCallback(response) {
         exit();
     } else {
         FB.api("/me/permissions", "GET", function (response) {
-            PERMISSIONS = response.data;
-            log(PERMISSIONS);
+            fb_PERMISSIONS = response.data;
+            log(fb_PERMISSIONS);
         });
     }
 }
@@ -51,8 +51,8 @@ function reRequestPermissions(permissions, onSuccess, onFailure) {
     // tu pytamy o dodatkowe uprawnienia, ktorych moze nam brakowac...
     if (!hasPermission(permissions)) {
         log("not ok?");
-        if (!PERMISSIONS[permissions]) {
-            PERMISSIONS[permissions] = true;
+        if (!fb_PERMISSIONS[permissions]) {
+            fb_PERMISSIONS[permissions] = true;
             reRequest(permissions, function (x) { 
                 if (hasPermission(permissions)) {
                     log('xxx');
@@ -77,9 +77,9 @@ function reRequestPermissions(permissions, onSuccess, onFailure) {
 
 function hasPermission(permissions) {
     log("szukam uprawnien: " + permissions);
-    for (var p in PERMISSIONS) {
-        if (PERMISSIONS[p].permission == permissions
-                && PERMISSIONS[p].status == 'granted') {
+    for (var p in fb_PERMISSIONS) {
+        if (fb_PERMISSIONS[p].permission == permissions
+                && fb_PERMISSIONS[p].status == 'granted') {
                     log("OK");
                     return true;
                 }
