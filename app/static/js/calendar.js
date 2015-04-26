@@ -11,8 +11,8 @@ calendar_main = function () {
     getFriends(getEvents);
     //tmp TODO REMOVE IT
     $("#user_id").val(FB.getUserID());
+
     $("#upload_ics").submit(function () {
-        event.preventDefault();
         var form = document.getElementById("upload_ics");
         var form_data = new FormData(form);
 
@@ -22,8 +22,8 @@ calendar_main = function () {
 
         var xhr = new XMLHttpRequest();
         // Add any event handlers here...
-        xhr.open('POST', "/upload_ics", true);
         xhr.onreadystatechange = function() {
+            log(xhr.readyState);
             if (xhr.readyState == 4) {
                 var div = $("#upload_alert");
                 div.append('<button type="button" class="close" data-dismiss="alert">×</button>');
@@ -40,7 +40,9 @@ calendar_main = function () {
                 $(document).trigger("load-stop");
             }
         }
+        xhr.open('POST', $(this).attr("action"), true);
         xhr.send(form_data);
+
         $(document).trigger("load-start");
         return false;
     });
