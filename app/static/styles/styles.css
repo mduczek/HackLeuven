@@ -280,3 +280,7 @@ body.loading .loading-modal {
     height: 400px;
     display: none;
 }
+#pups {
+    width: 80%;
+    margin: auto;
+}
