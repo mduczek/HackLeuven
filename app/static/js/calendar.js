@@ -1,8 +1,22 @@
+
+current_offset = -(new Date()).getHours();
+
 calendar_main = function () {
     log("calendar_main");
 
     showDate();
     setInterval(function() { showDate(); }, 10*60*1000);
+
+    $('#prev_day').click(function(){
+        current_offset -= 24;
+        _getEvents();
+    });
+
+    $('#next_day').click(function(){
+        current_offset += 24;
+        _getEvents();
+    });
+
 
     $("#add_calendar").click(function () {
         $("#upload_alert").hide().removeClass("alert-danger").removeClass('alert-succes').text("");
@@ -50,37 +64,43 @@ calendar_main = function () {
 
 getEvents = function (friends) {
     var calendar;
-    var f = [];
-    for (j = 0; j < friends.length; j++) {
-        f.push(friends[j].id);
+    global_f = [];
+    for (var j = 0; j < friends.length; j++) {
+        global_f.push(friends[j].id);
     }
-    var id = FB.getUserID();
-    es_get_id(blacklist_TBLNAME1, id, function (e) {
+    global_id = FB.getUserID();
+    es_get_id(blacklist_TBLNAME1, global_id, function (e) {
         var d = [];
         if (JSON.parse(e).found !== false) {
             d = JSON.parse(e)._source.blacklisted;
             log(d);
-            for (i = 0; i < d.length; i++) {
+            for (var i = 0; i < d.length; i++) {
                 var index = f.indexOf(d[i]);
                 if (index !== -1) {
-                    f.splice(index);
+                    global_f.splice(index);
                 }
             }
         }
-        $.ajax({
-            type: "POST",
-            url: "/events",
-            data: JSON.stringify({ "user": id, "friends": f }),
-            success: function(data) {
-                log(data);
-                calendar = JSON.parse(data);
-                log(calendar);
-                showCalendar(calendar);
-            }
-
-        });
+        _getEvents();
     });
-}
+};
+
+_getEvents = function() {
+    $.ajax({
+        type: "POST",
+        url: "/events",
+        data: JSON.stringify({ "user": global_id, "friends": global_f,
+            "range_back": -current_offset,
+            "range_ahead": current_offset+24}),
+        success: function(data) {
+            log(data);
+            calendar = JSON.parse(data);
+            log(calendar);
+            showCalendar(calendar);
+        }
+
+    });
+};
 
 showDate = function () {
     var date = new Date();
