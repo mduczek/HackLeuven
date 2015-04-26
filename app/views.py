@@ -74,90 +74,170 @@ def db_events_put(user, ics):
 
 @app.route('/events', methods=['POST'])
 def events_get():
-    from datetime import datetime
-    
+    from datetime import datetime, timedelta
+
+    # { user: user1, friends: [user2, user3], range_back: -h, range_ahead: +h }
     data = request.get_data()
-    # {user:user1, friends: [user1, user2]}
     data = json.loads(data)
 
-    user_events = db_events_get(data['user'], None, None)
+    dt_now = datetime.now()
+    dt_start = dt_now - timedelta(hours=int(data['range_back'])) if data.get('range_back') else dt_now - timedelta(hours=10)
+    dt_end = dt_now + timedelta(hours=int(data['range_ahead'])) if data.get('range_ahead') else dt_now + timedelta(hours=8)
+
+    user_events = db_events_get(data['user'], dt_start, dt_end)
     friends_events = []
     for friend in data['friends']:
-        friends_events.append((friend, db_events_get(friend, None, None)))
-    breaks = gaps(user_events, friends_events)
+        friends_events.append((friend, db_events_get(friend, dt_start, dt_end)))
+    user_ev = list(user_events)
+    breaks = gaps(user_events, friends_events, dt_start, dt_end)
 
-    return json.dumps({'events': user_events, 'breaks': breaks})
+    change_date_format(user_events)
+    for b in breaks:
+        change_date_format(b)
+
+    return json.dumps({'events': user_ev, 'breaks': breaks})
+
+def change_date_format(xs):
+    def change_field(x, field):
+        dt = strptime(x[field], '%Y-%m-%dT%H:%M:%S')
+        x[field] = strftime('%d/%m/%Y %H:%M', dt)
+
+    from time import strptime, strftime
+    for x in xs:
+        change_field(x, 'dt_start')
+        change_field(x, 'dt_end')
 
 @app.route('/check')
 def check():
     return str(db_events_get('A', None, None))
 
-def combine_ranges(xs):
-    xs = sorted(xs, key=lambda x: x['dt_start'])
-    print "combine_ranges >>>> " + str(xs)
-    if not xs:
-        return xs
-    current = xs[0]
-    combined = []
-    for x in xs[1:]:
-        if current['dt_start'] <= x['dt_start'] and x['dt_start'] <= current['dt_end']:
-            # current['dt_start'] = min(current['dt_start'], x['dt_start'])
-            current['dt_end'] = max(current['dt_end'], x['dt_end'])
+def merge_intervals(intervals):
+    intervals = sorted(intervals, key=lambda x: x['dt_start'])
+    
+    if not intervals:
+        return intervals
+    
+    merged = []
+    current = intervals[0]
+    for interval in intervals[1:]:
+        if current['dt_start'] <= interval['dt_start'] and interval['dt_start'] <= current['dt_end']:
+            current['dt_end'] = max(current['dt_end'], interval['dt_end'])
         else:
-            combined.append(current)
-            current = x
-    combined.append(current)
-    return combined
+            merged.append(current)
+            current = interval
+    merged.append(current)
 
-def common_gaps(xs, ys, yname):
+    return merged
+
+def common_gaps(my_intervals, friend_intervals, friend_uid, dt_start, dt_end):
+
     combined = []
-    combined.extend(xs)
-    combined.extend(ys)
-    combined = combine_ranges(combined)
+    combined.extend(my_intervals)
+    combined.extend(friend_intervals)
+    combined = merge_intervals(combined)
+
     gaps = []
-    dt_start = 0
-    last = 24
+    last = dt_start
+    from datetime import datetime
+
+    print("===>" + str(type(dt_start)))
+
     for x in combined:
-        gaps.append({'dt_start': dt_start, 'dt_end': x['dt_start'], 'user': yname})
-        dt_start = x['dt_end']
-    gaps.append({'dt_start': dt_start, 'dt_end': last, 'user': yname})
+        print x['dt_start'].split(".")[0]
+
+        x_start = datetime.strptime(x['dt_start'].split(".")[0], '%Y-%m-%dT%H:%M:%S')
+
+        print("===A" + str(type(x_start)))
+        print("===B" + str(type(last)))
+        print("****"+str(last))
+        delta = x_start - last
+        print(last)
+        print(x_start)
+        if delta.total_seconds()/60 > 30:
+            gaps.append({'dt_start': last.strftime('%Y-%m-%dT%H:%M:%S'), 'dt_end': x['dt_start'], 'user': friend_uid})
+        last = datetime.strptime(x['dt_end'].split(".")[0], '%Y-%m-%dT%H:%M:%S')
+        print(")))" + str(last))
+
+    delta = dt_end - last
+    if delta.total_seconds()/60 > 30:
+        gaps.append({'dt_start': last.strftime('%Y-%m-%dT%H:%M:%S'),
+                     'dt_end': dt_end.strftime('%Y-%m-%dT%H:%M:%S'), 'user': friend_uid})
+
     return gaps
 
 
-def gaps(user_events, friends_events):
+def gaps(user_events, friends_events, dt_start, dt_end):
     # user_events = [{'uid': '007', 'dt_start':12, 'dt_end':13, 'summary':'A'}]
     # friends_events = [ 
     #     [{'uid': '42', 'dt_start':12, 'dt_end':13, 'summary':'B'}, 
     #     {'uid': '42', 'dt_start':11, 'dt_end':15, 'summary':'B'}]
     # ]
     print "gaps >>>>" + str(user_events) + "||||" + str(friends_events)
-    gaps = [ common_gaps(user_events,friend_events, friend_name) for friend_name, friend_events in friends_events]
+    print("===" + str(type(dt_start)))
+    gaps = [ common_gaps(user_events,friend_events, friend_name, dt_start, dt_end) for friend_name, friend_events in friends_events]
     return gaps
 
 
 def db_events_get(user, dt_start, dt_end):
-    link = DB_PATH+'/events/_search?pretty'
+    link = DB_PATH + '/events/_search?pretty'
 
-    es_query = {"query": { "bool": { "must": [
-        {   "range": {
-                "dt_start": { "gte": "2013-12-15T00:00:00"}
-            }
-        },
-        {   "range": {
-                "dt_end": { "lte": "2015-12-15T00:00:00"}
-            }
-        },
-        {   "match": {
-                "uid": user
+    print "====="
+    print dt_start
+    print dt_end
+    print "====="
+
+    es_query = {
+        "query": {
+            "filtered": {
+                "query": {
+                    "match": { "uid": user }
+                },
+                "filter": {
+                    "bool": {
+                        "must": [
+                            {
+                                "range":  { "dt_start": { "gte": dt_start.strftime('%Y-%m-%dT%H:%M:%S') } }
+                            },
+                            {
+                                "range":  { "dt_end": { "lte": dt_end.strftime('%Y-%m-%dT%H:%M:%S') } }
+                            }
+                        ]
+                    }
+                }
             }
         }
-    ] } } }
+    }
+
+    # es_query = { "filter": { "bool": { "must": [
+    #     { "range": { "dt_start": { "gte": dt_start.strftime('%Y-%m-%dT%H:%M:%S') } } },
+    #     { "range": { "dt_end": { "lte": dt_end.strftime('%Y-%m-%dT%H:%M:%S') } } },
+    #     { "match": { "uid": user } }
+    # ] } } }
+
+    from datetime import datetime
+    import time
 
     r = requests.post(link, data=json.dumps(es_query))
-    #es_response_ok(r)
-    print "@@@@" + r.text
+    print r.text
     resp = json.loads(r.text)['hits']['hits']
-    return [ r['_source'] for r in resp ]
+    out = []
+    for r in resp:
+        x = r['_source']
+        start = datetime.strptime(x['dt_start'], '%Y-%m-%dT%H:%M:%S')
+        end = datetime.strptime(x['dt_end'], '%Y-%m-%dT%H:%M:%S')
+        print "S1>>" + str(start)
+        print "S2>>" + str(end)
+        print "S3>>" + str(time.mktime(dt_start.timetuple()))
+        print "S4>>" + str(time.mktime(dt_end.timetuple()))
+        if start > dt_start and end < dt_end:
+            out.append(x)
+    print "--->" + str(out)
+    return out
+
+    #r = requests.post(link, data=json.dumps(es_query))
+    app.logger.debug("DT SEARCH : " + r.text)
+    # resp = json.loads(r.text)['hits']['hits']
+    # return [r['_source'] for r in resp]
 
 
 @app.route('/upload_ics', methods=['GET', 'POST'])
