@@ -81,8 +81,8 @@ def events_get():
     data = json.loads(data)
 
     dt_now = datetime.now()
-    dt_start = dt_now - timedelta(hours=int(data['range_back'])) if data.get('range_back') else dt_now - timedelta(hours=10)
-    dt_end = dt_now + timedelta(hours=int(data['range_ahead'])) if data.get('range_ahead') else dt_now + timedelta(hours=8)
+    dt_start = dt_now - timedelta(hours=int(data['range_back'])) if data.get('range_back') else dt_now - timedelta(hours=1)
+    dt_end = dt_now + timedelta(hours=int(data['range_ahead'])) if data.get('range_ahead') else dt_now + timedelta(hours=12)
 
     user_events = db_events_get(data['user'], dt_start, dt_end)
     friends_events = []
@@ -113,10 +113,10 @@ def check():
 
 def merge_intervals(intervals):
     intervals = sorted(intervals, key=lambda x: x['dt_start'])
-    
+
     if not intervals:
         return intervals
-    
+
     merged = []
     current = intervals[0]
     for interval in intervals[1:]:
@@ -168,8 +168,8 @@ def common_gaps(my_intervals, friend_intervals, friend_uid, dt_start, dt_end):
 
 def gaps(user_events, friends_events, dt_start, dt_end):
     # user_events = [{'uid': '007', 'dt_start':12, 'dt_end':13, 'summary':'A'}]
-    # friends_events = [ 
-    #     [{'uid': '42', 'dt_start':12, 'dt_end':13, 'summary':'B'}, 
+    # friends_events = [
+    #     [{'uid': '42', 'dt_start':12, 'dt_end':13, 'summary':'B'},
     #     {'uid': '42', 'dt_start':11, 'dt_end':15, 'summary':'B'}]
     # ]
     print "gaps >>>>" + str(user_events) + "||||" + str(friends_events)
