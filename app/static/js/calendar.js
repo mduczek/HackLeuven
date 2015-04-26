@@ -246,7 +246,8 @@ showCalendar = function (calendar) {
                 center: myLatlng,       
                 mapTypeId: google.maps.MapTypeId.ROADMAP  
             };
-            var map = new google.maps.Map(el, options);  
+            var map = new google.maps.Map2(el, options);  
+                map.setCenter(myLatlng);
             console.log(el);
             var marker = new google.maps.Marker({
                 position: new google.maps.LatLng(lat, lon),
