@@ -10,11 +10,13 @@ calendar_main = function () {
     $('#prev_day').click(function(){
         current_offset -= 24;
         _getEvents();
+        showDate();
     });
 
     $('#next_day').click(function(){
         current_offset += 24;
         _getEvents();
+        showDate();
     });
 
 
@@ -103,7 +105,7 @@ _getEvents = function() {
 };
 
 showDate = function () {
-    var date = new Date(Date.now() - current_offset*3600*1000);
+    var date = new Date(Date.now() + current_offset*3600*1000);
     var d = ""
           + date.getFullYear()
           + "/"
