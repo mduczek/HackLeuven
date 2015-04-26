@@ -238,24 +238,22 @@ showCalendar = function (calendar) {
             var el = document.getElementById('map-holder');
             var el2 = $(el);
             el2.show();
-            console.log(lat);
-            console.log(lon);
+
             var myLatlng = new google.maps.LatLng(lat + 0.05, lon - 0.1);
             var options = {  
                 zoom: 12,  
                 center: myLatlng,       
                 mapTypeId: google.maps.MapTypeId.ROADMAP  
             };
-            setTimeout(function () {
-                var map = new google.maps.Map2(el, options);  
-                map.setCenter(myLatlng);
-                console.log(el);
-                var marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(lat, lon),
-                    map: map,
-                    title: "Last known location..."
-                });
-            }, 100);
+            var map = new google.maps.Map2(el, options);  
+            map.setCenter(myLatlng);
+            google.maps.event.trigger(map, 'resize');
+
+            var marker = new google.maps.Marker({
+                position: new google.maps.LatLng(lat, lon),
+                map: map,
+                title: "Last known location..."
+            });
         });
     }
 
