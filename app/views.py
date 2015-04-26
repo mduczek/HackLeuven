@@ -271,6 +271,3 @@ def upload_file():
 
     return jsonify(status="unknown"), 420
 
-@app.route("/tmp")
-def tmp():
-    return render_template("tmp.html")
