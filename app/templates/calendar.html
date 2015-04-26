@@ -1,5 +1,9 @@
 {% extends "index.html" %}
 
+{% block scripts %}
+<script src="https://maps.googleapis.com/maps/api/js"></script>
+{% endblock %}
+
 {% block body %}
 
 <div class="row">
@@ -77,6 +81,8 @@
                         <td class="data"></td>
                     </tr>
                 </table>
+                <div id="button-holder"></div>
+                <div id="map-holder"></div>
             </div>
         </div>
     </div>
@@ -84,6 +90,3 @@
 
 {% endblock %}
 
-{% block scripts %}
-
-{% endblock %}

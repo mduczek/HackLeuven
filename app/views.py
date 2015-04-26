@@ -143,6 +143,7 @@ def common_gaps(my_intervals, friend_intervals, friend_uid, dt_start, dt_end):
 
     gaps = []
     last = dt_start
+    last_location = ""
     from datetime import datetime
 
     print("===>" + str(type(dt_start)))
@@ -159,14 +160,19 @@ def common_gaps(my_intervals, friend_intervals, friend_uid, dt_start, dt_end):
         print(last)
         print(x_start)
         if delta.total_seconds()/60 > 30:
-            gaps.append({'dt_start': last.strftime('%Y-%m-%dT%H:%M:%S'), 'dt_end': x['dt_start'], 'user': friend_uid})
+            print("kjdskjsdhfjksdhfksjdhfksjdhfkjsdhf ----123 " + last_location + " " + x['dt_start'])
+            gaps.append({'dt_start': last.strftime('%Y-%m-%dT%H:%M:%S'), 'dt_end': x['dt_start'], 'user': friend_uid, 'location': last_location})
         last = datetime.strptime(x['dt_end'].split(".")[0], '%Y-%m-%dT%H:%M:%S')
+        if x.get('location'):
+            last_location = x['location']
+            print("kjdskjsdhfjksdhfksjdhfksjdhfkjsdhf ---- " + last_location)
         print(")))" + str(last))
 
     delta = dt_end - last
     if delta.total_seconds()/60 > 30:
+        print("kjdskjsdhfjksdhfksjdhfksjdhfkjsdhf ----1234 " + last_location)
         gaps.append({'dt_start': last.strftime('%Y-%m-%dT%H:%M:%S'),
-                     'dt_end': dt_end.strftime('%Y-%m-%dT%H:%M:%S'), 'user': friend_uid})
+            'dt_end': dt_end.strftime('%Y-%m-%dT%H:%M:%S'), 'user': friend_uid, 'location': last_location})
 
     return gaps
 

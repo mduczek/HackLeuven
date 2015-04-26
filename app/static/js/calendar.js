@@ -3,7 +3,8 @@ current_offset = -(new Date()).getHours();
 
 clear_table_data = function() {
     $("#contact-details td.data").text("");
-    $("#contact-details").parent().find("button").remove();
+    $("#button-holder").html("");
+    $("#map-holder").html("");
 };
 
 calendar_main = function () {
@@ -222,12 +223,38 @@ showCalendar = function (calendar) {
             //TODO email
             FB.api("/" + user + "?fields=email,first_name,last_name,picture.width(40).height(40)", "GET", function (e) {
                 USERS.users.push(e);
-                addUserElement(user, container, e, { dt_start: brk.dt_start, dt_end: brk.dt_end });
+                addUserElement(user, container, e, { dt_start: brk.dt_start, dt_end: brk.dt_end, location: brk.location });
             });
         } else {
-            addUserElement(user, container, null, { dt_start: brk.dt_start, dt_end: brk.dt_end });
+            addUserElement(user, container, null, { dt_start: brk.dt_start, dt_end: brk.dt_end, location: brk.location });
         }
     };
+
+    var showMap = function(location, container) {
+        $.get("http://maps.googleapis.com/maps/api/geocode/json?address=" + encodeURIComponent(location), function (e) {
+            log(e);
+            var lat = e.results[0].geometry.location.lat;
+            var lon = e.results[0].geometry.location.lng;
+            var el = document.getElementById('map-holder');
+            var el2 = $(el);
+            el2.show();
+            console.log(lat);
+            console.log(lon);
+            var myLatlng = new google.maps.LatLng(lat + 0.05, lon - 0.1);
+            var options = {  
+                zoom: 12,  
+                center: myLatlng,       
+                mapTypeId: google.maps.MapTypeId.ROADMAP  
+            };
+            var map = new google.maps.Map(el, options);  
+            console.log(el);
+            var marker = new google.maps.Marker({
+                position: new google.maps.LatLng(lat, lon),
+                map: map,
+                title: "Last known location..."
+            });
+        });
+    }
 
     var addUserElement = function (user, container, data, brk) {
         if (data === null) {
@@ -256,14 +283,19 @@ showCalendar = function (calendar) {
                 table.find("#contact-email").html("<a href=\"mailto:" + data.email + "\">" + data.email + "</a>");
             }
             table.find("#contact-free").text("Free from " + brk.dt_start + " to " + brk.dt_end);
-            var btn = $("<btn/>", {class: "btn btn-info"}).text("Poke!");
+            var btn = $("<btn/>", {class: "btn btn-info", id: "poke"}).text("Poke!");
             btn.click(function () {
                 send_notification(data.id, "@[" + FB.getUserID() + "] Hi, wanna meet up between " + brk.dt_start + " and " + brk.dt_end + " ?");
                 $(this).after($("<div/>").text("Poked!"));
                 $(this).fadeOut(1000);
+                $("#button-holder").html("");
             });
-            table.parent().append(btn);
+            $("#button-holder").append(btn);
+
             $(window).scrollTop(0);
+            if (brk['location'] && brk['location'] !== "") {
+                showMap(brk.location, table.parent());
+            }
 
         });
     };

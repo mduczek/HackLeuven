@@ -275,3 +275,8 @@ body.loading .loading-modal {
     background-position: right;
     font-weight: bold;
 }
+#map-holder {
+    width: 100%;
+    height: 400px;
+    display: none;
+}
