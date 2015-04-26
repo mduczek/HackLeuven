@@ -85,7 +85,7 @@ showDate = function () {
     var d = ""
           + date.getFullYear()
           + "/"
-          + date.getMonth()
+          + (date.getMonth() + 1)
           + "/"
           + date.getDate()
           + " "
