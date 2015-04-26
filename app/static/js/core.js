@@ -37,6 +37,11 @@ var blacklist_REM_TOOLTIP = "Remove user from blacklist";
 var blacklist_TBLNAME1 = "Blacklist_cant_see_me";
 var blacklist_TBLNAME2 = "Blacklist_cant_see_them";
 
+var USERS = {
+    ids: []
+    , users: []
+};
+
 $(document).ready(function () {
 
     var body = $("body");

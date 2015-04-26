@@ -1,5 +1,9 @@
-
 current_offset = -(new Date()).getHours();
+
+
+clear_table_data = function() {
+    $("#contact-details td.data").text("");
+};
 
 calendar_main = function () {
     log("calendar_main");
@@ -155,6 +159,7 @@ showCalendar = function (calendar) {
     var dt_start = {}, dt_end = {};
 
     var getTime = function(dateStr) {
+        log(dateStr);
         var res = {hour:undefined, minutes:undefined};
         var tmp = dateStr.split(" ")[1];
         tmp = tmp.split(":");
@@ -165,35 +170,98 @@ showCalendar = function (calendar) {
         return res
     };
 
-    var getContainer = function(dt_start, dt_end) {
-        var event_container = $("<div/>", { class: "event panel" });
+    var getContainer = function(dt_start, dt_end, brk) {
         var start = $(".hour" + dt_start.hour);
         log(start);
         var t = start.position().top + ((dt_start.minutes/60) *  start.outerHeight());
         var end = $(".hour" + dt_end.hour);
         var e = (end.position().top +  + ((dt_end.minutes/60) *  end.outerHeight())) - t;
+
+        var event_container;
+        event_container = $("<div/>", { class: "event panel" });
         event_container.css("top", t + "px");
         event_container.css("height", e + "px");
+        if (brk) {
+            var brkclass = "brk";
+
+            var tmp = $("." + brkclass + "[id=brk" + dt_start.hour + "]") ;
+            if (tmp.length > 0 && tmp[0] !== undefined) {
+                event_container = tmp;
+                log(tmp);
+                tmp.remove();
+            } else {
+                event_container.addClass("panel-light").addClass(brkclass);
+                log(dt_start.hour);
+                event_container.attr("id", "brk" + dt_start.hour);
+            }
+        }
+
         return event_container;
+    };
+
+    var setUserElement = function(brk, container) {
+        var user = brk.user;
+        var index = USERS.ids.indexOf(user);
+        if (index === -1) {
+            //TODO email
+            FB.api("/" + user + "?fields=email,first_name,last_name,picture.width(40).height(40)", "GET", function (e) {
+                USERS.users.push(e);
+                addUserElement(user, container, e, { dt_start: brk.dt_start, dt_end: brk.dt_end });
+            });
+        } else {
+            addUserElement(user, container, null, { dt_start: brk.dt_start, dt_end: brk.dt_end });
+        }
+    };
+
+    var addUserElement = function (user, container, data, brk) {
+        if (data === null) {
+            for (i = 0; i < USERS.users.length; i++) {
+                if (USERS.users[i].id === user) {
+                    data = USERS.users[i];
+                }
+            }
+        }
+        log(user);
+        var div = $("<div/>", { class: "person width40" } );
+        div.css("background-image", "url(" + data.picture.data.url + ")");
+        var profile = $("<div/>", { class: "profile width40", id: data.id });
+        profile.append(div);
+
+        var p = $("<p/>", { class: "name" });
+        p.text(data.first_name);
+        profile.append(p);
+        container.append(profile);
+        profile.attr("data-toggle", "modal").attr("data-target", "#personal-details");
+        profile.click(function() {
+            clear_table_data();
+            var table = $("#contact-details");
+            table.find("#contact-name").text(data.first_name + " " + data.last_name);
+            if (data.email !== undefined) {
+                table.find("#contact-email").html("<a href=\"mailto:" + data.email + "\">" + data.email + "</a>");
+            }
+            table.find("#contact-free").text("Free from " + brk.dt_start + " to " + brk.dt_end);
+        });
     };
 
     for (i = 0; i < calendar.events.length; i++) {
          dt_start = getTime(calendar.events[i].dt_start);
          dt_end = getTime(calendar.events[i].dt_end);
 
-         var event_container = getContainer(dt_start, dt_end);
+         var event_container = getContainer(dt_start, dt_end, false);
          event_container.append($("<div/>", { class: "panel-body" }).text(calendar.events[i].summary));
          $("#events").append(event_container);
     }
 
     for (i = 0; i < calendar.breaks.length; i++ ) {
-        var brk = calendar.breaks[i];
-        dt_start = getTime(brk.dt_start);
-        dt_end = getTime(brk.dt_end);
+        for (j = 0; j < calendar.breaks[i].length; j++) {
+            var brk = calendar.breaks[i][j];
+            dt_start = getTime(brk.dt_start);
+            dt_end = getTime(brk.dt_end);
 
-        var event_container = getContainer(dt_start, dt_end);
-        event_container.append($("<div/>", { class: "panel-body" }).text("Break with: " + brk.user));
-        $("#events").append(event_container);
+            var event_container = getContainer(dt_start, dt_end, true);
+            setUserElement(brk, event_container);
+            $("#events").append(event_container);
+        }
     }
 
 }

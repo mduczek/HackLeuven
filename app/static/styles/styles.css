@@ -169,12 +169,30 @@ body.loading .loading-modal {
     border-radius: calc(75px/2);
     background-repeat: no-repeat;
 }
+.person.width40 {
+    width: 40px;
+    height: 40px;
+    border-radius: calc(40px/2);
+    display: inline-block;
+}
 .profile {
     display: inline-block;
     width: 75px;
     margin-right: 25px;
     margin-bottom: 25px;
     position: relative;
+}
+.profile.width40 {
+    margin-right: 10px;
+    margin-bottom: 5px;
+    min-width: 110px;
+}
+.profile.width40 p {
+    display: inline-block;
+    height: 40px;
+    top: -15px;
+    position: relative;
+    margin-left: 5px;
 }
 .profile.blacklisted .person {
     opacity: 0.2;
@@ -240,6 +258,9 @@ body.loading .loading-modal {
     position: absolute;
     width: 50%;
     left: 25%;
+}
+.event.panel-light {
+    background: transparent;
 }
 #upload_alert {
     display: none;
