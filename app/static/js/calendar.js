@@ -74,17 +74,25 @@ getEvents = function (friends) {
     for (var j = 0; j < friends.length; j++) {
         global_f.push(friends[j].id);
     }
+    log(global_f);
     global_id = FB.getUserID();
-    es_get_id(blacklist_TBLNAME1, global_id, function (e) {
+    es_get_id(blacklist_TBLNAME2, global_id, function (e) {
         var d = [];
         if (JSON.parse(e).found !== false) {
             d = JSON.parse(e)._source.blacklisted;
-            log(d);
+            console.log(">>>" + d);
+            dc = {}
+            for (var i = 0; i < global_f.length; i++) {
+                dc[global_f[i]] = 1;
+            }
+            console.log(dc);
             for (var i = 0; i < d.length; i++) {
-                var index = f.indexOf(d[i]);
-                if (index !== -1) {
-                    global_f.splice(index);
-                }
+                delete dc[d[i]];
+            }
+            global_f = [];
+            console.log(dc);
+            for (var k in dc) {
+                global_f.push(k);
             }
         }
         _getEvents();

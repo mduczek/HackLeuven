@@ -39,7 +39,7 @@ function blacklistFriend(f) {
     f.attr("title", blacklist_REM_TOOLTIP);
     log(id);
     updateBlacklistTbl(blacklist_TBLNAME1, FB.getUserID(), id, true);
-    updateBlacklistTbl(blacklist_TBLNAME2, id, _B.getUserID(), true);
+    updateBlacklistTbl(blacklist_TBLNAME2, id, FB.getUserID(), true);
 }
 function unblacklistFriend(f) {
     var id = f.parent().attr("id");
