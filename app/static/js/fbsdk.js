@@ -92,3 +92,15 @@ function onAuthResponseChange(response) {
     log('onAuthResponseChange', response);
     loginCallback(response);
 }
+
+function getFriends(callback) {
+    log("getFriends");
+    var id = FB.getUserID();
+    log(id);
+
+    FB.api("/" + id + "/friends?fields=id,name,picture.width(75).height(75)", "GET", function (response) {
+        log(response);
+        callback(response.data);
+    });
+}
+

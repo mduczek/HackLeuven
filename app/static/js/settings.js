@@ -1,23 +1,12 @@
 function settings_main() {
     log("Settings, alrighty!");
-    getFriends();
+    getFriends(getBlacklistTbl);
 
 };
 var ADD_TOOLTIP = "Add user to blacklist";
 var REM_TOOLTIP = "Remove user from blacklist";
 var TBLNAME1 = "Blacklist_cant_see_me";
 var TBLNAME2 = "Blacklist_cant_see_them";
-
-function getFriends() {
-    log("getFriends");
-    var id = FB.getUserID();
-    log(id);
-
-    FB.api("/" + id + "/friends?fields=id,name,picture.width(75).height(75)", "GET", function (response) {
-        log(response);
-        getBlacklistTbl(response.data);
-    });
-}
 
 function showFriends(f, blacklisted) {
     for (i = 0; i < f.length; i++) {
