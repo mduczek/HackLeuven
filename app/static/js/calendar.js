@@ -103,7 +103,7 @@ _getEvents = function() {
 };
 
 showDate = function () {
-    var date = new Date();
+    var date = new Date(Date.now() - current_offset*3600*1000);
     var d = ""
           + date.getFullYear()
           + "/"
