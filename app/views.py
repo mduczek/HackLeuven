@@ -80,8 +80,14 @@ def events_get():
     data = json.loads(data)
 
     dt_now = datetime.now()
-    dt_start = dt_now - timedelta(hours=int(data['range_back'])) if data.get('range_back') else dt_now - timedelta(hours=1)
-    dt_end = dt_now + timedelta(hours=int(data['range_ahead'])) if data.get('range_ahead') else dt_now + timedelta(hours=12)
+
+    if data.get('range_back') and data.get('range_ahead'):
+        dt_start = dt_now - timedelta(hours=int(data['range_back']))
+        dt_end = dt_now + timedelta(hours=int(data['range_ahead']))
+    else:
+        dt_start = datetime(dt_now.year, dt_now.month, dt_now.day)
+        dt_end = datetime(dt_now.year, dt_now.month, dt_now.day, 23, 59, 59)
+
 
     user_events = db_events_get(data['user'], dt_start, dt_end)
     friends_events = []
