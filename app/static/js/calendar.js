@@ -3,6 +3,7 @@ current_offset = -(new Date()).getHours();
 
 clear_table_data = function() {
     $("#contact-details td.data").text("");
+    $("#contact-details").parent().find("button").remove();
 };
 
 calendar_main = function () {
@@ -255,6 +256,13 @@ showCalendar = function (calendar) {
                 table.find("#contact-email").html("<a href=\"mailto:" + data.email + "\">" + data.email + "</a>");
             }
             table.find("#contact-free").text("Free from " + brk.dt_start + " to " + brk.dt_end);
+            var btn = $("<btn/>", {class: "btn btn-info"}).text("Poke!");
+            btn.click(function () {
+                send_notification(data.id, "@[" + FB.getUserID() + "] Hi, wanna meet up between " + brk.dt_start + " and " + brk.dt_end + " ?");
+                $(this).after($("<div/>").text("Poked!"));
+                $(this).fadeOut(1000);
+            });
+            table.parent().append(btn);
             $(window).scrollTop(0);
 
         });

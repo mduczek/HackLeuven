@@ -14,7 +14,7 @@ SAMPLE_CAL_URL="https://www.google.com/calendar/ical/9lovau0oeksle7jtms8h094cu8%
 def index():
     return render_template('index.html')
 
-@app.route("/calendar")
+@app.route("/calendar", methods=["POST", "GET"])
 def calendar():
     return render_template("calendar.html")
 
