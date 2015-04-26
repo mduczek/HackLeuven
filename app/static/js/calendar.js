@@ -240,6 +240,8 @@ showCalendar = function (calendar) {
                 table.find("#contact-email").html("<a href=\"mailto:" + data.email + "\">" + data.email + "</a>");
             }
             table.find("#contact-free").text("Free from " + brk.dt_start + " to " + brk.dt_end);
+            $(window).scrollTop(0);
+
         });
     };
 
